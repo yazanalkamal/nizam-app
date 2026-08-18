@@ -1,0 +1,14 @@
+# Normalize line endings in the repo; check out native on Windows.
+* text=auto
+
+# Files consumed by Linux containers / CI must stay LF regardless of platform.
+*.sh          text eol=lf
+*.py          text eol=lf
+*.yml         text eol=lf
+*.yaml        text eol=lf
+Dockerfile*   text eol=lf
+Caddyfile     text eol=lf
+*.md          text eol=lf
+
+# Arabic corpus & golden set: text, but never auto-munged by diff heuristics.
+*.json        text eol=lf

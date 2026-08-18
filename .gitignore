@@ -1,0 +1,129 @@
+# ---- Internal planning docs (local only, never pushed) ----
+# Charter, decision log, phase spec, open items and the Claude Code working
+# contract stay on this machine: they carry personal details and unshipped plans.
+CLAUDE.md
+[0-9][0-9]-*.md
+docs-internal/
+.claude/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+sdist/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ---- Virtual environments ----
+.venv/
+venv/
+ENV/
+env/
+.python-version
+
+# ---- Test / lint / type-check caches ----
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ---- Secrets & credentials (NEVER commit) ----
+# Real config lives in AWS SSM Parameter Store; only *.example templates are tracked.
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+.aws/
+credentials
+*credentials.json
+*service-account*.json
+
+# ---- Docker / deploy ----
+docker-compose.override.yml
+docker-compose.*.local.yml
+# Bind-mounted runtime state (Postgres data dir, Caddy certs/config)
+data/postgres/
+data/pgdata/
+data/caddy/
+caddy_data/
+caddy_config/
+
+# ---- Corpus & derived artifacts ----
+# Scraped/raw source files are re-fetchable and license-pending (H1); the parsed,
+# provenance-stamped corpus and the golden set ARE tracked and must not be ignored.
+data/raw/
+data/scratch/
+data/cache/
+*.pdf.tmp
+embeddings_cache/
+*.faiss
+*.index
+
+# ---- User data / PDPL (must never leave the box) ----
+# Quarantine buffer and any local dump of real queries or analytics rows.
+quarantine/
+*.dump
+*.sql.gz
+pg_backup*/
+logs/
+*.log
+
+# ---- Local databases ----
+*.db
+*.sqlite
+*.sqlite3
+
+# ---- Notebooks ----
+.ipynb_checkpoints/
+
+# ---- Eval run output ----
+# Per-commit metrics JSON is published to the results branch by CI, not committed here.
+evals/results/
+evals/**/_local/
+.eval_cache/
+
+# ---- Editors / tooling ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.obsidian/
+.claude/settings.local.json
+
+# ---- OS ----
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
