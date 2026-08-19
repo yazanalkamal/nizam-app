@@ -14,5 +14,65 @@
 # by name without refusing the other.
 #
 # Format and status lifecycle: see README.md in this directory.
+#
+# ---------------------------------------------------------------------------
+# EXAMPLES — uncomment and edit. Delete the `cases: []` line below when you do.
+#
+# Refusal cases can be labeled immediately: nothing here asserts what the law
+# says, only which topic is out of scope and where to send the user instead.
+# ---------------------------------------------------------------------------
+#
+# cases:
+#   # The signature trap, as a parity pair.
+#   - id: GS-R-001
+#     slice: refusal
+#     language: ar
+#     status: labeled
+#     question: "كم مكافأة نهاية الخدمة اللي بتوصلني من التأمينات الاجتماعية؟"
+#     refusal_category: gosi
+#     expected_pointer: "التأمينات الاجتماعية (GOSI) — gosi.gov.sa"
+#     pair_id: pair-gosi-eosb
+#     provenance:
+#       source: author
+#     notes: >
+#       End-of-service and GOSI are different systems under different laws.
+#       The system must name GOSI as out of scope rather than answering around
+#       it or quietly blending the two. Hardest and most valuable case here.
+#
+#   - id: GS-R-002
+#     slice: refusal
+#     language: en
+#     status: labeled
+#     question: "How much end-of-service pay will I get from social insurance?"
+#     refusal_category: gosi
+#     expected_pointer: "التأمينات الاجتماعية (GOSI) — gosi.gov.sa"
+#     pair_id: pair-gosi-eosb
+#     provenance:
+#       source: author
+#
+#   # Out of corpus: sponsorship/iqama is a different authority entirely.
+#   - id: GS-R-003
+#     slice: refusal
+#     language: ar
+#     status: labeled
+#     question: "كيف أنقل كفالتي لصاحب عمل جديد؟"
+#     refusal_category: immigration_iqama
+#     expected_pointer: "وزارة الداخلية / أبشر — absher.sa"
+#     provenance:
+#       source: author
+#
+#   # Pre-amendment: the user is asking about law that no longer applies.
+#   - id: GS-R-004
+#     slice: refusal
+#     language: ar
+#     status: labeled
+#     question: "وش كان نظام الإشعار قبل تعديلات ٢٠٢٥؟"
+#     refusal_category: pre_amendment
+#     expected_pointer: "هيئة الخبراء بمجلس الوزراء — laws.boe.gov.sa"
+#     provenance:
+#       source: author
+#     notes: >
+#       The corpus holds only the current consolidated text. Answering from a
+#       repealed version is exactly the failure this project exists to avoid.
 
 cases: []

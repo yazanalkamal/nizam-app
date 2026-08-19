@@ -9,9 +9,73 @@
 #   - wage changes shortly before termination (out of scope — the system must
 #     say so rather than guessing)
 #
-# Monetary values are QUOTED STRINGS. A bare YAML number parses as a float and
+# Monetary values are QUOTED STRINGS. A bare YAML decimal parses as a float and
 # will not survive exact-match comparison; the validator rejects floats.
 #
 # Format and status lifecycle: see README.md in this directory.
+#
+# ---------------------------------------------------------------------------
+# EXAMPLES — uncomment and edit. Delete the `cases: []` line below when you do.
+#
+# The expected amount and article numbers in the second example are
+# PLACEHOLDERS to show the shape. No number here is a real calculation. Every
+# one must be derived from the ingested current text before use.
+# ---------------------------------------------------------------------------
+#
+# cases:
+#   # As you write it today. Inputs are facts about a hypothetical person, so
+#   # you can fill them in now. The expected amount cannot be — it depends on
+#   # the law text, which isn't ingested yet. Hence status: drafted.
+#   - id: GS-C-001
+#     slice: calculator
+#     language: ar
+#     status: drafted
+#     question: "راتبي ١٢٠٠٠ وخدمتي من مارس ٢٠٢٠ إلى يونيو ٢٠٢٤ واستقلت، كم مكافأة نهاية الخدمة؟"
+#     inputs:
+#       monthly_wage: "12000.00"        # quoted — see the money rule above
+#       start_date: 2020-03-01
+#       end_date: 2024-06-30
+#       termination_type: resignation
+#     provenance:
+#       source: author
+#     notes: >
+#       Question uses Arabic-Indic digits on purpose — the normalizer has to
+#       fold ٠-٩ to ASCII before anything else reads it.
+#
+#   # The same case once the number is derived and checked.
+#   - id: GS-C-002
+#     slice: calculator
+#     language: ar
+#     status: labeled
+#     question: "راتبي ١٠٠٠٠ وخدمتي ٦ سنوات كاملة وانتهى العقد، كم أستحق؟"
+#     inputs:
+#       monthly_wage: "10000.00"
+#       start_date: 2018-01-01
+#       end_date: 2024-01-01
+#       termination_type: contract_expiry
+#     expected:
+#       amount: "00000.00"              # PLACEHOLDER — derive from the text
+#       currency: SAR
+#     gold_article_ids: [84, 85]        # PLACEHOLDER — verify against the text
+#     provenance:
+#       source: mhrsd_faq
+#       url: https://www.hrsd.gov.sa/...
+#       retrieved: 2026-08-19
+#
+#   # Adversarial: resignation under two years. Include the awkward ones — the
+#   # happy path is not where a calculator breaks.
+#   - id: GS-C-003
+#     slice: calculator
+#     language: ar
+#     status: drafted
+#     question: "اشتغلت سنة وثمانية أشهر واستقلت، كم لي؟"
+#     inputs:
+#       monthly_wage: "8500.00"
+#       start_date: 2023-01-15
+#       end_date: 2024-09-15
+#       termination_type: resignation
+#     provenance:
+#       source: author
+#     notes: "Short-service resignation. Expected outcome may be zero — that is still an answer."
 
 cases: []

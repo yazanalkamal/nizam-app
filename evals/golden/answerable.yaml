@@ -7,5 +7,61 @@
 #
 # Format and status lifecycle: see README.md in this directory.
 # Write questions first with status: drafted. Labels come after ingestion.
+#
+# ---------------------------------------------------------------------------
+# EXAMPLES — uncomment and edit. Delete the `cases: []` line below when you do.
+#
+# The article numbers in the second example are PLACEHOLDERS to show the shape.
+# Every one must be checked against the ingested text before it is used.
+# ---------------------------------------------------------------------------
+#
+# cases:
+#   # A question as you write it today: no corpus yet, so nothing is labeled.
+#   - id: GS-A-001
+#     slice: answerable
+#     language: ar
+#     status: drafted
+#     question: "هل يقدر صاحب العمل يمدد فترة التجربة؟"
+#     provenance:
+#       source: author
+#
+#   # The same case after ingestion, once you know which article answers it.
+#   # Note what changed: status, gold_article_ids, answer_key, and a dated URL.
+#   - id: GS-A-002
+#     slice: answerable
+#     language: ar
+#     status: labeled
+#     question: "كم مدة الإشعار إذا قدمت استقالتي؟"
+#     gold_article_ids: [75]          # PLACEHOLDER — verify against the text
+#     answer_key: >
+#       What a correct answer must convey, in your own words, taken from the
+#       source. Not the full article text — the substance the judge checks for.
+#     provenance:
+#       source: mhrsd_faq
+#       url: https://www.hrsd.gov.sa/...
+#       retrieved: 2026-08-19
+#     notes: >
+#       M/44 made notice asymmetric — employer-initiated and employee-initiated
+#       differ. Confirm the case covers the employee-initiated side only.
+#
+#   # A parity pair: same question, two languages, linked by pair_id.
+#   # Both must exist or validation fails.
+#   - id: GS-A-003
+#     slice: answerable
+#     language: ar
+#     status: drafted
+#     question: "كم يوم إجازة سنوية أستحقها؟"
+#     pair_id: pair-annual-leave
+#     provenance:
+#       source: author
+#
+#   - id: GS-A-004
+#     slice: answerable
+#     language: en
+#     status: drafted
+#     question: "How many days of annual leave am I entitled to?"
+#     pair_id: pair-annual-leave
+#     provenance:
+#       source: author
 
 cases: []
