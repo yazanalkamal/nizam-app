@@ -60,14 +60,30 @@ Every case, regardless of slice:
   language: ar            # ar | en
   status: drafted         # drafted | labeled | verified
   question: "..."         # the question exactly as a user would type it
+  topic: eosb             # see the topic list below; optional but used for coverage
   pair_id: null           # set to a shared string to link an ar/en pair
   notes: null             # free text, optional
   provenance:
-    source: author        # author | mhrsd_faq | boe_text | tester
-    url: null             # required when source is mhrsd_faq or boe_text
+    source: author        # author | mhrsd_faq | boe_text | tester | public_forum
+    url: null             # required for mhrsd_faq, boe_text, public_forum
     retrieved: null       # date the URL was read; required with url
     note: null
 ```
+
+Long questions read better as a literal block, which also avoids escaping quotes:
+
+```yaml
+  question: |-
+    نص السؤال هنا كما كتبه صاحبه
+```
+
+**Topics** — `eosb`, `resignation_termination`, `notice`, `probation`,
+`annual_leave`, `wage_definition`, `contract_vs_law`, `out_of_scope`.
+
+The last two were added after the first research pass showed they were among the
+most common real questions. `wage_definition` is which allowances count toward
+the wage base; `contract_vs_law` is a contract term that contradicts the amended
+law. Both sit inside topics already in scope — no new corpus area.
 
 `extra` fields are forbidden — a typo'd key fails validation rather than being
 silently ignored.
@@ -81,23 +97,52 @@ silently ignored.
 
 ### `calculator` cases
 
+Every calculator case declares what the system is expected to *do*:
+
+| `expects` | Meaning | Requires |
+|---|---|---|
+| `amount` | Enough information given; produce an exact figure | `expected_amount` once labeled |
+| `clarification` | Something is missing; ask for it | `missing_parameters` |
+| `out_of_scope` | e.g. wage change near termination; say so | neither |
+
 ```yaml
+  expects: amount
   inputs:
-    monthly_wage: "12000.00"        # STRING, not a bare number — see below
+    monthly_wage: "12000.00"        # STRING, not a bare decimal — see below
     start_date: 2020-03-01
     end_date: 2024-06-30
+    stated_duration: null           # verbatim, when the user gives no dates
     termination_type: resignation   # employer_termination | resignation |
                                     # contract_expiry | mutual_agreement |
                                     # article_80 | article_81
-  expected:
+  expected_amount:
     amount: "31250.00"              # STRING. Exact match, no tolerance.
     currency: SAR
   gold_article_ids: [84, 85]
 ```
 
-**Money is quoted.** YAML parses a bare `31250.50` as a float, and floats do not
-survive exact-match comparison intact. The validator rejects any monetary value
-that arrives as a float, so quoting is enforced rather than remembered.
+A clarification case instead names what is missing, and validation rejects it if
+`inputs` actually supplies one of them — a case claiming the wage is missing while
+supplying a wage tests nothing:
+
+```yaml
+  expects: clarification
+  inputs:
+    stated_duration: "٦ سنين ونص"   # what the user actually wrote
+    termination_type: resignation
+  missing_parameters: [monthly_wage]
+```
+
+**Why this type exists.** Of ~40 real questions collected in the first research
+pass, not one supplied a wage, both dates and a termination type together. People
+write "خدمتي 7 سنوات" and never mention their salary. A model handed that will
+invent a wage and answer confidently, so asking for the missing parameter is
+behavior the eval set has to measure.
+
+**Quote decimal money.** YAML parses a bare `31250.50` as a float, and float noise
+breaks exact-match comparison. The validator rejects any monetary value arriving
+as a float. Whole numbers (`12000`) are exact and are accepted unquoted, though
+quoting everything is one less rule to remember.
 
 ### `refusal` cases
 

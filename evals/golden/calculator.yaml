@@ -1,81 +1,84 @@
 # Golden set — calculator slice (target: 15)
 #
-# End-of-service benefit questions with exact expected numbers. Scored by exact
-# match; no LLM judge is involved in this slice.
-#
-# Must include the adversarial cases, not just the happy path:
-#   - resignation under 2 years of service
-#   - fractional years
-#   - wage changes shortly before termination (out of scope — the system must
-#     say so rather than guessing)
+# End-of-service benefit questions. Three expected outcomes:
+#   expects: amount         — enough information; scored by exact match, no judge
+#   expects: clarification  — something is missing; the system must ask for it
+#   expects: out_of_scope   — e.g. wage change near termination; must say so
 #
 # Monetary values are QUOTED STRINGS. A bare YAML decimal parses as a float and
 # will not survive exact-match comparison; the validator rejects floats.
 #
 # Format and status lifecycle: see README.md in this directory.
 #
-# ---------------------------------------------------------------------------
-# EXAMPLES — uncomment and edit. Delete the `cases: []` line below when you do.
-#
-# The expected amount and article numbers in the second example are
-# PLACEHOLDERS to show the shape. No number here is a real calculation. Every
-# one must be derived from the ingested current text before use.
-# ---------------------------------------------------------------------------
-#
-# cases:
-#   # As you write it today. Inputs are facts about a hypothetical person, so
-#   # you can fill them in now. The expected amount cannot be — it depends on
-#   # the law text, which isn't ingested yet. Hence status: drafted.
-#   - id: GS-C-001
-#     slice: calculator
-#     language: ar
-#     status: drafted
-#     question: "راتبي ١٢٠٠٠ وخدمتي من مارس ٢٠٢٠ إلى يونيو ٢٠٢٤ واستقلت، كم مكافأة نهاية الخدمة؟"
-#     inputs:
-#       monthly_wage: "12000.00"        # quoted — see the money rule above
-#       start_date: 2020-03-01
-#       end_date: 2024-06-30
-#       termination_type: resignation
-#     provenance:
-#       source: author
-#     notes: >
-#       Question uses Arabic-Indic digits on purpose — the normalizer has to
-#       fold ٠-٩ to ASCII before anything else reads it.
-#
-#   # The same case once the number is derived and checked.
-#   - id: GS-C-002
-#     slice: calculator
-#     language: ar
-#     status: labeled
-#     question: "راتبي ١٠٠٠٠ وخدمتي ٦ سنوات كاملة وانتهى العقد، كم أستحق؟"
-#     inputs:
-#       monthly_wage: "10000.00"
-#       start_date: 2018-01-01
-#       end_date: 2024-01-01
-#       termination_type: contract_expiry
-#     expected:
-#       amount: "00000.00"              # PLACEHOLDER — derive from the text
-#       currency: SAR
-#     gold_article_ids: [84, 85]        # PLACEHOLDER — verify against the text
-#     provenance:
-#       source: mhrsd_faq
-#       url: https://www.hrsd.gov.sa/...
-#       retrieved: 2026-08-19
-#
-#   # Adversarial: resignation under two years. Include the awkward ones — the
-#   # happy path is not where a calculator breaks.
-#   - id: GS-C-003
-#     slice: calculator
-#     language: ar
-#     status: drafted
-#     question: "اشتغلت سنة وثمانية أشهر واستقلت، كم لي؟"
-#     inputs:
-#       monthly_wage: "8500.00"
-#       start_date: 2023-01-15
-#       end_date: 2024-09-15
-#       termination_type: resignation
-#     provenance:
-#       source: author
-#     notes: "Short-service resignation. Expected outcome may be zero — that is still an answer."
+# WHAT THE FIRST RESEARCH PASS FOUND: of ~40 real questions collected, NOT ONE
+# supplied a wage, a start date, an end date and a termination type together.
+# People write "خدمتي 7 سنوات" and never mention their salary. So every case
+# below is a clarification case, and the `expects: amount` cases still have to be
+# authored by hand with complete inputs.
 
-cases: []
+cases:
+  - id: GS-C-001
+    slice: calculator
+    language: ar
+    status: drafted
+    topic: eosb
+    expects: clarification
+    question: |-
+      تذا كانت خدمتي في الشركة 6 سنوات و 8 اشهر و 20 يوما وتم انهاء عقدي وفقا للمادة 75 من نظام العمل فكم تكون نهاية خدمتي
+    inputs:
+      stated_duration: "6 سنوات و 8 اشهر و 20 يوما"
+      termination_type: employer_termination
+    missing_parameters: [monthly_wage]
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 13 November 2025"
+    notes: >
+      Asks for a figure ("فكم تكون") with no salary anywhere in the question. The
+      dangerous failure is a model inventing a wage and answering confidently.
+      Note the typo "تذا" for "إذا" — left exactly as written.
+
+  - id: GS-C-002
+    slice: calculator
+    language: ar
+    status: drafted
+    topic: eosb
+    expects: clarification
+    question: |-
+      خدمتي سنتين و8 شهور في الشركة وقبل يومين بلغوني أنهم راح ينهو نشاط الشركة فماهي مكافأة نهاية الخدمة وهل أستحق تعويض عن فترة الاشعار مع العلم أن عقدي غير محدد المدة
+    inputs:
+      stated_duration: "سنتين و8 شهور"
+      termination_type: employer_termination
+    missing_parameters: [monthly_wage]
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 30 June 2025"
+    notes: >
+      Two asks in one: a figure (needs the wage) and an entitlement question about
+      notice compensation (answerable without it). The system should answer the
+      second while asking for the first, not refuse both.
+
+  - id: GS-C-003
+    slice: calculator
+    language: ar
+    status: drafted
+    topic: eosb
+    expects: clarification
+    question: |-
+      خدمتي 9 سنوات و11 شهر ، بعد كم يوم النشاط سيغلق ، لكن لم يتم تبليغنا كتابياً بالإنهاء ، هل يحق لي مطالبتهم بمبلغ شهرين الاشعار ومكافئة ال10 سنوات؟! وهل ستكون مستحقاتي على اساس راتب كامل عن كل سنه ؟
+    inputs:
+      stated_duration: "9 سنوات و11 شهر"
+      termination_type: employer_termination
+    missing_parameters: [monthly_wage]
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 26 June 2025"
+    notes: >
+      User rounds 9y11m to "10 years" themselves. The system must not adopt the
+      user's rounding — whether the boundary matters is a legal question, not an
+      arithmetic convenience.

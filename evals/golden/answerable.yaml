@@ -2,66 +2,404 @@
 #
 # Questions the system SHOULD answer, each labeled with the article(s) that
 # support the answer. Measures retrieval recall@5 and MRR, plus the LLM-judge
-# answer grade. These 35 also serve as the over-refusal denominator: a refusal
-# here is a failure.
+# answer grade. These also serve as the over-refusal denominator: a refusal here
+# is a failure.
 #
 # Format and status lifecycle: see README.md in this directory.
-# Write questions first with status: drafted. Labels come after ingestion.
 #
-# ---------------------------------------------------------------------------
-# EXAMPLES — uncomment and edit. Delete the `cases: []` line below when you do.
-#
-# The article numbers in the second example are PLACEHOLDERS to show the shape.
-# Every one must be checked against the ingested text before it is used.
-# ---------------------------------------------------------------------------
-#
-# cases:
-#   # A question as you write it today: no corpus yet, so nothing is labeled.
-#   - id: GS-A-001
-#     slice: answerable
-#     language: ar
-#     status: drafted
-#     question: "هل يقدر صاحب العمل يمدد فترة التجربة؟"
-#     provenance:
-#       source: author
-#
-#   # The same case after ingestion, once you know which article answers it.
-#   # Note what changed: status, gold_article_ids, answer_key, and a dated URL.
-#   - id: GS-A-002
-#     slice: answerable
-#     language: ar
-#     status: labeled
-#     question: "كم مدة الإشعار إذا قدمت استقالتي؟"
-#     gold_article_ids: [75]          # PLACEHOLDER — verify against the text
-#     answer_key: >
-#       What a correct answer must convey, in your own words, taken from the
-#       source. Not the full article text — the substance the judge checks for.
-#     provenance:
-#       source: mhrsd_faq
-#       url: https://www.hrsd.gov.sa/...
-#       retrieved: 2026-08-19
-#     notes: >
-#       M/44 made notice asymmetric — employer-initiated and employee-initiated
-#       differ. Confirm the case covers the employee-initiated side only.
-#
-#   # A parity pair: same question, two languages, linked by pair_id.
-#   # Both must exist or validation fails.
-#   - id: GS-A-003
-#     slice: answerable
-#     language: ar
-#     status: drafted
-#     question: "كم يوم إجازة سنوية أستحقها؟"
-#     pair_id: pair-annual-leave
-#     provenance:
-#       source: author
-#
-#   - id: GS-A-004
-#     slice: answerable
-#     language: en
-#     status: drafted
-#     question: "How many days of annual leave am I entitled to?"
-#     pair_id: pair-annual-leave
-#     provenance:
-#       source: author
+# SOURCE WARNING: every case below came from one website (manielaw-sa.com), from
+# three comment threads. People commenting under an article about Article 75 ask
+# about Article 75, so this distribution reflects those pages, not what Saudis
+# generally worry about. The remaining slots should come from other sources.
 
-cases: []
+cases:
+  # --- wage definition: which allowances count toward the EOSB base -----------
+  - id: GS-A-001
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: wage_definition
+    question: |-
+      السلام عليكم ارغب بمعرفه مكافئة نهاية الخدمة الراتب الأساسي ٦٥٠٠ بدل المواصلات ١٦٢٥ بدل السكن ٥٤١ بدل متغير سوق العمل ٢٠٠٠ هل البدل المتغير يدخل من ضمن احتساب نهاية الخدمه وشكرا
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 26 March 2025"
+    notes: >
+      Gives a full wage breakdown but asks which components count, not for a
+      total. Arabic-Indic digits throughout — exercises the normalizer.
+
+  - id: GS-A-002
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: wage_definition
+    question: |-
+      خدمتي 9 سنوات هل استحق مكافءة نهاية الخدمة كاملة علما ان العقد غير محدد المدة وكيف يتم احتساب مكافءة نهاية الخدمة اذا كان الراتب الاجمالي 4200 وبعد خصم التامينات 3930 هل يتم احتساب المكفاءة قبل خصم التامينات او بعد خصم التامينات
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 20 May 2025"
+    notes: >
+      Mentions GOSI but is NOT a GOSI question — it asks what the wage base is,
+      which the Labor Law defines. Must be answered, not refused. Good test of
+      the refusal classifier over-triggering on the word التأمينات.
+
+  # --- EOSB entitlement ------------------------------------------------------
+  - id: GS-A-003
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: eosb
+    question: |-
+      السلام عليكم ورحمة الله وبركاته،،،، شكراً لكم على شرح المادة وتثقيف المتابعين السؤال كالتالي/ كيف يتم حساب مكافأة نهاية الخدمة اذا كان عقدي غير محدد المدة (مدة الخدمة 7 سنوات) وقد اشعرت صاحب العمل قبل 30 يوماً؟ هل تكون نهاية الخدمة نصف راتب للخمس سنوات الاولى وراتب لباقي السنوات او يتم الاحتساب وفق ثلثين المكافأة، وجزيتم خير الجزاء
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 21 April 2025"
+    notes: "Asks which formula applies and offers two candidates. No wage given, but no number is wanted."
+
+  - id: GS-A-004
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: eosb
+    question: |-
+      عقدي غير محدد المدى وخدمتي ٦ سنين ونص واعطيتهم فترة اشعار شهر خبروني انه ماستحق مكافاة كاملة بس استحق ثلث مكافاة عن اول خمسة سنين وثلثي بعد الخمسة سنين وانه تعتبر استقالة هل هذا صحيح
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 9 October 2025"
+    notes: >
+      The recurring shape: employer states a rule, employee asks whether it is
+      true. Also the employer-reclassifies-as-resignation flashpoint.
+
+  - id: GS-A-005
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: eosb
+    question: |-
+      خدمتي كانت سنة وستة أشهر، وقد أنهيت عقدي وفق المادة (75) من نظام العمل لأسباب شخصية، مع الالتزام الكامل بفترة الإشعار النظامية. إلا أن الشركة أفادت بعدم استحقاقي لمكافأة نهاية الخدمة بحجة أن مدة خدمتي أقل من سنتين، وذلك استنادًا إلى المادة (85) من نظام العمل هل استحق مكافأة ام لا ؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 6 January 2026"
+    notes: "Sub-two-year service, which the spec names as an adversarial case."
+
+  - id: GS-A-006
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: eosb
+    question: |-
+      سعودي عقد عمل مفتوح مدة العمل 1 سنة و 11 شهر طلب انهاء عقد من نفسه لانه جاي له عرض وظيفي اخر وقضى فترة الاشعار المطلوبة والان نحسب صرف مستحقاته الادارة عندنا تقول هذا استقالة ويطبق عليه اقل من سنتين ماله نهاية خدمة افيدنا الله يسعدك
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 8 September 2025"
+    notes: "Asked from the employer's side — HR checking their own position. Different voice, same question."
+
+  # --- resignation vs termination classification -----------------------------
+  - id: GS-A-007
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: resignation_termination
+    question: |-
+      السلام عليكم عقدي غير محدد المدة وارسلت طلب انهاء العقد ولكن الشركة مصره على ان الانهاء استقاله وليس انهاء لعقد غير محدد المدة مالاجراء؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 30 July 2025"
+
+  - id: GS-A-008
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: resignation_termination
+    question: |-
+      رغبت بإنهاء عقد ورفضت الشركه واخبروني نظامهم مافيه انهاء عقد بعد سنتين لان أصبح العقد غير محدد المده. وقال مافيه الا استقاله.
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 10 September 2025"
+
+  - id: GS-A-009
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: resignation_termination
+    question: |-
+      وش صار معاك أنا نفسك ابغى اطلع وحطوني استقاله مديري كتب في الأيميل ان الموظف لايرغب بتجدد عقده وعقدي غير محدد المده اقدر اعدل عليه من قوى من انهم طلعوني ب استقاله بس مازال. العقد جاري آخر يوم دوام لي ٣١ /٧ ساعدوني الله يخليكم اسويها من قوى وخلاص كيف اقدر اخذ مكافأة نهاية الخدمه أنا أصلا ماطلبت استقاله وقاله للمدير من زمان بس رفعها ٢٦/٦ والورقه كان مكتوب عليها استقاله وش اقدر اسوي
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 5 August 2025"
+    notes: >
+      Messiest phrasing in the set: no punctuation, dialect, mixed dates, replying
+      to another commenter. Keep exactly as written — this is what real input
+      looks like and a tidied version would test nothing.
+
+  # --- contract term vs the amended law (gap 5) ------------------------------
+  - id: GS-A-010
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: contract_vs_law
+    question: |-
+      عقدي غير محدد المدة وارغب في إنهاء العقد بدون سبب للعمل على مشروع جانبي السوال الان انا لي 3 سنوات وشهرين مسجل في عقدي بند اختياري بالاخير إلزام الطرف الراغب ب إنهاء العقد مدة 60 يوم بينما بالنظام الجديد اصبحت 30 يوم وش التزم فيه ؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 27 July 2025"
+
+  - id: GS-A-011
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: contract_vs_law
+    question: |-
+      ع حسب العقد مكتوب فترة الاشعار شهرين .. لكن بالتعديلات الجديده شهر واحد للموظف .. هل لازم اكمل الشهرين !!؟ ولا فقط شهر واحد !!؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 29 October 2025"
+
+  - id: GS-A-012
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: contract_vs_law
+    question: |-
+      عقدي غير محدد المدة و مكتوب في العقد الاشعار شهرين " تم توقيعه قبل التعديل على المادة ٧٥" هل يمشي على ٣٠ يوم كما في التعديل او على مدة الاشعار المذكورة في العقد؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 15 October 2025"
+    notes: "Contract predates the amendment explicitly. Cleanest statement of the which-instrument-prevails question."
+
+  - id: GS-A-013
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: contract_vs_law
+    question: |-
+      أنا عقدي غير محدد المدة - مدة خدمتي 6 سنوات - ولكن في بوابة منصة قوى خيار المادة 75 يرفض معي ويطلع لي ( لا يمكن اختيار هذا السبب لإنهاء العلاقة التعاقدية ) [يجب أن تكون فترة الإشعار للعقود غير محددة المدة على الأقل 60 يوماً في حالة دفع الراتب على اساس شهري) ولا أستطيع اختيار سبب غيره ما هو الحل برأيكم .
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 11 August 2025"
+    notes: >
+      Mentions Qiwa but is NOT a Qiwa how-to. The platform is asserting a rule and
+      the user is asking whether it is right. Answer it. A refusal here would be a
+      false positive — this is the Qiwa-as-unreliable-narrator case.
+
+  - id: GS-A-014
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: contract_vs_law
+    question: |-
+      عقدي غير محدد المدة سعودية . رفعت اشعار كتابي ف الايميل و تم الطلب مني رفع استقاله و ان الاشعار ٦٠ يوم و عند ردي عليهم ان هذا مخالف للنظام الجديد تم تحويلي لممثل القانوني للشركة . و لم ياتي اي رد منهم لمذه ٦ ايام بعدها رفعت الانهاء عن طريق قوى على ماده ٧٥ و بدات الحسبة ٣٠ يوم هل سأواجه اي مشكله من الشركة ؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 29 July 2025"
+    notes: "Edges toward 'what will happen to me', which is close to advice. Watch where the refusal boundary sits."
+
+  - id: GS-A-015
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: notice
+    question: |-
+      اذا الموظف قدم انهاء عقد غير محدد المدة وكانت مدة الاشعار 30 يوم والمنشأة قبلت الانهاء بشرط ان يكون الانهاء بعد 36 يوم حتى يتم الانتهاء من المهام المطلوبة علماً ان في عقد العمل نص على ان تكون فترة الانهاء لا تقل عن 60 يوم للطرفين هل تصرف المنشأة صحيح، وهل يحق لها تمديد الفترة؟ وفي حال عدم التزام الموظف بفترة الاشعار الموجوده في العقد هل يترتب عليه شي؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 10 August 2025"
+    notes: "Three questions in one. Tests whether the system answers all parts or silently drops some."
+
+  # --- probation -------------------------------------------------------------
+  - id: GS-A-016
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: contract_vs_law
+    question: |-
+      انا في فترة تجربة من ١ ديسمبر ٢٠٢٤ اي تنتهي ٢٨ فبراير ولكن التعديلات على النظام صدرت قبل نهاية فترة التجربة هل تصبح ١٨٠ دون تعديل العقد علما أن العقد ورقي ارغب بترك العمل لوظيفة اخرى وعقدي محدد المدة جهة شبه حكومي
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 1 March 2025"
+    notes: >
+      Retroactivity: does an amendment that lands mid-probation change an existing
+      contract? Highest-value question type in the whole set.
+
+  - id: GS-A-017
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: probation
+    question: |-
+      السلام عليكم يوجد بند اضافى فى العقد ان الطرف الاول فقط هو من يحق له انهاء العقد وانا ما زلت فى فتره التجربه واريد انهاء العقد وانا الطرف الثانى هل القانون يتيح لى ذلك ؟ شكرا
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 4 March 2025"
+
+  - id: GS-A-018
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: probation
+    question: |-
+      السلام عليكم ورحمة الله وبركاته تم إبرام عقد بيني وبين المؤسسه من بدايه السنه الحاليه على أن تكون فتره التجربه ٩٠ يوم ويريد صاحب المؤسسه تجديد ٩٠ يوم أخرى هل لي الحق في عدم القبول؟ وفي حاله عدم القبول اي اللي ممكن يترتب على ذلك ارجوا الرد
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 16 March 2025"
+
+  - id: GS-A-019
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: probation
+    question: |-
+      نص عقد العمل علي فترة تجربة 90 يوم ويوجد نص بالعقد ( فترة التجربة 90 يوم من تاريخ مباشرو اعمل ويحق للشركة تمديدها لفترة مماثلة ) هل يحق للشركة التمديد بعد فترة 90 يوم دون أشعاري طبقا لهذا النص
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 15 January 2026"
+    notes: "Contract dated after the amendment but drafted from an old template."
+
+  - id: GS-A-020
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: probation
+    question: |-
+      انا فترة تجربتي ٣ شهور وتم تمديد شهر واحد فقط وكان لدي اجازة مرضية في نفس الفترة سؤالي الاول هل يحق لصاحب العمل تمديد فترة التجربة شهر او شهرين او انه ملزم بمدة مماثله (اقصد ال ٣ شهور الاولى) سؤالي الثاني هل تحسب الاجازة المرضية من مدة فترة التجربة ام انها تحسب عدد ايام الاجازة المرضية وتضاف الى فترة التجربة ؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 19 March 2025"
+
+  - id: GS-A-021
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: probation
+    question: |-
+      انا عقدي غير محدد المدة ولكنني لازلت بتجربة ١٨٠ يوم هل يجوز لي إنهاء العقد دون القلق من التعويضات سواء كان لارهاق وعدم الرغبة في الاكمال ؟ انهاء العقد ينتهي في اليوم الذي فعلته ولا يتطلب حضوري بعدها اليس كذلك ؟ هل يتطلب اسباب للترك ام لا ؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 21 January 2026"
+
+  - id: GS-A-022
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: probation
+    question: |-
+      السلام عليكم انا في فترة تجربة وبعد أيام سأكمل 180 يوم هل يحق لي أن اطلب ترك العمل بعد عدة ايام فقط من انتهاء الفترة ؟ دون اعتبارها استقالة ؟ مع العلم اني مررت ب ٣ اجازات رسمية ( التأسيس والعيدين ) واخذت اجازتين مرضيتين خلالها
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 25 June 2025"
+    notes: "Whether holidays and sick leave extend probation — a date-math question hidden inside a probation question."
+
+  # --- annual leave ----------------------------------------------------------
+  - id: GS-A-023
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: annual_leave
+    question: |-
+      تم الاستقاله بفترة التجربة وذلك بسبب التمديد لفترة التجربة فلي بالشركة 3 اشهر والاجازة السنوية 30 يوم هل استطيع ان اطالب بمبلغ مالي بدل الاجازه السنوية فكل شهر عباره عن يومين ونصف يعتبر تقريبا 7 ايام ونص ذلك خلال 3 اشهر التي عملت بها هل استطيع المطالبه بها او لا
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 18 June 2025"
+    notes: "User did the arithmetic themselves and wants the entitlement confirmed, not recomputed."
+
+  - id: GS-A-024
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: annual_leave
+    question: |-
+      هل يحق للموظف خلال فترة التجربة استخدام إجازته السنوية حسب ايام خدمته واذا انهاء عقده خلال الفترة التجربه يعوض بمبلغ الاجازات ؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 1 December 2025"
+
+  - id: GS-A-025
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: annual_leave
+    question: |-
+      تم انهاء عقدي خلال فترة التجربة , هل لى الحق فى المطالبة برصيد اجازتي السنوية عن فترة عملي خلال فترة التجربة علما بانها تخطت 140 يوم
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 6 October 2025"
+
+  - id: GS-A-026
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: contract_vs_law
+    question: |-
+      اعمل في شركة خاصه و في عقدي الموثق في قوى ٣٠ يوم اجازه سنويه ، عملت لديهم سنتين و ٤ اشهر = ٧٠ يوم رصيد الاجازة السنويه المستحق ، هل يحق لهم حساب اجازتي السنويه ٢١ يوم فقط بدل عن ٣٠ يوم والذي متفق عليه مسبقاً في العقد ؟ هل يحق لهم خصم بدل السكن من المستحقات الماليه للاجازه السنوية ؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/كيفية-حساب-مستحقات-الإجازة-السنوية/
+      retrieved: 2026-08-19
+      note: "page dated 18 May 2025; individual comment date not exposed"
+    notes: >
+      Contract is MORE generous than the statutory floor — the mirror image of the
+      usual contract-vs-law case, where the contract is worse. Both directions
+      need to work.
+
+  - id: GS-A-027
+    slice: answerable
+    language: ar
+    status: drafted
+    topic: annual_leave
+    question: |-
+      اليك احتساب اجازة عيد الاضحى اذا تخللها عطلة نهاية الاسبوع اجازة عيد الاضحى 4 ايام عمل + يومين عطلة نهاية الاسبوع هل تحتسب 6 ايام ام 4 ايام؟
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 4 August 2025"

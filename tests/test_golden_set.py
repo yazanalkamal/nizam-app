@@ -141,6 +141,7 @@ def _calc_case(**overrides) -> dict:
         "language": "ar",
         "status": "drafted",
         "question": "كم مكافأة نهاية الخدمة؟",
+        "expects": "amount",
         "provenance": {"source": "author"},
         "inputs": {
             "monthly_wage": "12000.00",
@@ -181,8 +182,68 @@ def test_unquoted_money_in_yaml_is_rejected():
 
 
 def test_labeled_calculator_case_requires_an_expected_amount():
-    with pytest.raises(ValidationError, match="requires an expected amount"):
+    with pytest.raises(ValidationError, match="requires expected_amount"):
         GoldenFile.model_validate({"cases": [_calc_case(status="labeled")]})
+
+
+# --------------------------------------------------------------------------
+# Calculator slice: incomplete questions expecting a clarifying question back
+# --------------------------------------------------------------------------
+
+
+def _clarify_case(**overrides) -> dict:
+    """A real-shaped question: service duration stated, salary never mentioned."""
+    return _calc_case(
+        expects="clarification",
+        question="خدمتي ٦ سنين ونص واستقلت، كم مكافأة نهاية الخدمة؟",
+        inputs={"stated_duration": "٦ سنين ونص", "termination_type": "resignation"},
+        missing_parameters=["monthly_wage"],
+    ) | overrides
+
+
+def test_clarification_case_is_valid_without_a_wage():
+    parsed = GoldenFile.model_validate({"cases": [_clarify_case()]})
+    case = parsed.cases[0]
+    assert case.inputs.monthly_wage is None
+    assert case.inputs.stated_duration == "٦ سنين ونص"
+
+
+def test_clarification_case_must_say_what_is_missing():
+    with pytest.raises(ValidationError, match="requires missing_parameters"):
+        GoldenFile.model_validate({"cases": [_clarify_case(missing_parameters=[])]})
+
+
+def test_clarification_case_cannot_supply_what_it_calls_missing():
+    """A case claiming the wage is missing while supplying one tests nothing."""
+    case = _clarify_case(
+        inputs={"monthly_wage": "12000.00", "termination_type": "resignation"}
+    )
+    with pytest.raises(ValidationError, match="listed as missing but supplied"):
+        GoldenFile.model_validate({"cases": [case]})
+
+
+def test_clarification_case_cannot_carry_an_expected_amount():
+    case = _clarify_case(expected_amount={"amount": "1000.00"})
+    with pytest.raises(ValidationError, match="must not carry an expected_amount"):
+        GoldenFile.model_validate({"cases": [case]})
+
+
+def test_missing_parameters_is_rejected_on_an_amount_case():
+    with pytest.raises(ValidationError, match="only applies when expects=clarification"):
+        GoldenFile.model_validate(
+            {"cases": [_calc_case(missing_parameters=["monthly_wage"])]}
+        )
+
+
+def test_out_of_scope_calculator_case_needs_neither():
+    """e.g. a wage change shortly before termination — expect a refusal, not a number."""
+    case = _calc_case(
+        expects="out_of_scope",
+        question="تغير راتبي قبل نهاية الخدمة بشهرين، كيف تحسب المكافأة؟",
+        status="labeled",
+    )
+    parsed = GoldenFile.model_validate({"cases": [case]})
+    assert parsed.cases[0].expected_amount is None
 
 
 def test_end_date_must_follow_start_date():

@@ -6,73 +6,188 @@
 # A refusal is a helpful redirect that names the topic and points somewhere real
 # — never a bare "I can't help with that".
 #
-# Categories to cover: gosi, implementing_regulations, domestic_workers,
-# immigration_iqama, qiwa_procedures, pre_amendment, legal_advice, out_of_corpus.
+# These can be labeled immediately: nothing here asserts what the law says, only
+# which topic is out of scope and where to send the person instead.
 #
-# The highest-value case in the whole golden set lives here: an end-of-service
-# question entangled with GOSI. Answering it correctly means refusing one half
-# by name without refusing the other.
+# IMPORTANT COUNTERPART: mentioning GOSI or Qiwa does not make a question out of
+# scope. GS-A-002 mentions GOSI but asks what the wage base is (answerable), and
+# GS-A-013 mentions Qiwa but asks which notice rule prevails (answerable). Those
+# are the false positives this slice must not train the classifier to produce.
 #
 # Format and status lifecycle: see README.md in this directory.
-#
-# ---------------------------------------------------------------------------
-# EXAMPLES — uncomment and edit. Delete the `cases: []` line below when you do.
-#
-# Refusal cases can be labeled immediately: nothing here asserts what the law
-# says, only which topic is out of scope and where to send the user instead.
-# ---------------------------------------------------------------------------
-#
-# cases:
-#   # The signature trap, as a parity pair.
-#   - id: GS-R-001
-#     slice: refusal
-#     language: ar
-#     status: labeled
-#     question: "كم مكافأة نهاية الخدمة اللي بتوصلني من التأمينات الاجتماعية؟"
-#     refusal_category: gosi
-#     expected_pointer: "التأمينات الاجتماعية (GOSI) — gosi.gov.sa"
-#     pair_id: pair-gosi-eosb
-#     provenance:
-#       source: author
-#     notes: >
-#       End-of-service and GOSI are different systems under different laws.
-#       The system must name GOSI as out of scope rather than answering around
-#       it or quietly blending the two. Hardest and most valuable case here.
-#
-#   - id: GS-R-002
-#     slice: refusal
-#     language: en
-#     status: labeled
-#     question: "How much end-of-service pay will I get from social insurance?"
-#     refusal_category: gosi
-#     expected_pointer: "التأمينات الاجتماعية (GOSI) — gosi.gov.sa"
-#     pair_id: pair-gosi-eosb
-#     provenance:
-#       source: author
-#
-#   # Out of corpus: sponsorship/iqama is a different authority entirely.
-#   - id: GS-R-003
-#     slice: refusal
-#     language: ar
-#     status: labeled
-#     question: "كيف أنقل كفالتي لصاحب عمل جديد؟"
-#     refusal_category: immigration_iqama
-#     expected_pointer: "وزارة الداخلية / أبشر — absher.sa"
-#     provenance:
-#       source: author
-#
-#   # Pre-amendment: the user is asking about law that no longer applies.
-#   - id: GS-R-004
-#     slice: refusal
-#     language: ar
-#     status: labeled
-#     question: "وش كان نظام الإشعار قبل تعديلات ٢٠٢٥؟"
-#     refusal_category: pre_amendment
-#     expected_pointer: "هيئة الخبراء بمجلس الوزراء — laws.boe.gov.sa"
-#     provenance:
-#       source: author
-#     notes: >
-#       The corpus holds only the current consolidated text. Answering from a
-#       repealed version is exactly the failure this project exists to avoid.
 
-cases: []
+cases:
+  # --- GOSI / social insurance ----------------------------------------------
+  - id: GS-R-001
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      عطوني شعار انهاء العلاقه. عقد على المادة 75 والمادة 84 وتفاجا جاني بتامينات كذا بسبب: (فسخ العقد بموجب المادة (80) من نظام العمل) التأمينات الاجتماعية(GOSI)
+    refusal_category: gosi
+    expected_pointer: "التأمينات الاجتماعية (GOSI) — gosi.gov.sa"
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 25 January 2026"
+    notes: >
+      Blended: the labour-law termination basis (in scope) and the reason recorded
+      in the GOSI system (out of scope) conflict. Refuse the GOSI record half by
+      name without refusing the article question.
+
+  - id: GS-R-002
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      سلام عليكم لقد تركت الوظيفة في فترة التجربة ولدي ملاحظتين ابحث عن جواب لهما: ١- وضعت الشركة التي تركتها سبب الاستبعاد في التأمينات الاجتماعيه (استقاله) بدلا من (فسخ عقد خلال فترة التجربة) ، هل هنالك فرق جوهري ممكن يؤثر علي وهل اطالب بتعديل سبب الاستبعاد من الشركة نفسها؟ ٢- تم اعطائي الراتب لشهر يوليو للفترة التي عملت بها ، ولكن لم يتم اعطائي بدل التذاكر للمدة التي عملت بها وهي ٣ شهور، هل انا مستحق لبدل التذاكر ؟
+    refusal_category: gosi
+    expected_pointer: "التأمينات الاجتماعية (GOSI) — gosi.gov.sa"
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 26 July 2025"
+    notes: "Part 1 is a GOSI coding question; part 2 (ticket allowance) may be in scope. Tests partial refusal."
+
+  - id: GS-R-003
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      هل الماده ٧٥ في العقد الغير محدد المده تأهل للاستفادة من ساند . وشكرا
+    refusal_category: gosi
+    expected_pointer: "ساند / التأمينات الاجتماعية (GOSI) — gosi.gov.sa"
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 6 May 2025"
+    notes: "SANED unemployment insurance sits under GOSI, not the Labor Law, despite the Article 75 framing."
+
+  - id: GS-R-004
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      العقد الغير محدد المده وعملت في الشركة مده 10 شهور متواصلة والان اخبرني صاحب العمل كتابيا ب انه سيتم انهاء عقدي بدون ذكر سبب مشروع هل استحق راتب الاجازه وراتب الشهرين ؟ وهل استحق ساند ؟
+    refusal_category: gosi
+    expected_pointer: "ساند / التأمينات الاجتماعية (GOSI) — gosi.gov.sa"
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 14 August 2025"
+    notes: >
+      The clearest partial case: leave pay and notice pay are in scope, SANED is
+      not. Answering both or refusing both are equally wrong.
+
+  # --- immigration / iqama / sponsorship -------------------------------------
+  - id: GS-R-005
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      سلام عليكم ورحمه الله وبركاته هل يجب على العامل نقل كفالته من الشركة إلى شركة خلال فترة التجربة ام يستطيع ترك كفالته على الشركة القديمة لحين انتهاء فترة التجربة مع الشركة الجديدة وبالتالي يستطيع تقل كفالته للشركة الجديدة بعد انتهاء فترة التجربة على الشركة الجديدة وممكن اعرف اي مادة في نظام العمل ينص على هذا الموضوع او يتعلق فيه شكرا جزيلا
+    refusal_category: immigration_iqama
+    expected_pointer: "وزارة الداخلية / أبشر — absher.sa"
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 3 February 2025"
+    notes: "Explicitly asks which Labor Law article covers sponsorship transfer. The honest answer is none."
+
+  - id: GS-R-006
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      فسخت عقدي خلال فترة تجربه و كفيل رافض يعطيني خروج نهائي اش الحل ؟
+    refusal_category: immigration_iqama
+    expected_pointer: "وزارة الداخلية / أبشر — absher.sa"
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 10 July 2025"
+
+  - id: GS-R-007
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      السلام عليكم ورحمه الله وبركاته انتهاء العقد خلال فترة التجربه من طرف صاحب العمل ولكن دون تجديد الاقامه وحاليآ الاقامه منتهي ما الحل
+    refusal_category: immigration_iqama
+    expected_pointer: "وزارة الداخلية / أبشر — absher.sa"
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 17 February 2025"
+
+  - id: GS-R-008
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      عامل لديه رصيد سنوي متراكم 200 يوما ويريد إخراج تأشيرة خروج وعوده 90 يوما ماذا افعل في صرف مستحقات الإجازة هل يأخذ مستحقات 90 يوما فقط أو ياخذ مستحقات رصيد إجازته كلها دون النظر علي ايام الاجازة التي يريد أن يحصل عليها
+    refusal_category: immigration_iqama
+    expected_pointer: "وزارة الداخلية / أبشر — absher.sa"
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/كيفية-حساب-مستحقات-الإجازة-السنوية/
+      retrieved: 2026-08-19
+      note: "page dated 18 May 2025; individual comment date not exposed"
+    notes: >
+      Borderline. The accrued-leave payout half is in scope; only the exit-visa
+      mechanics are not. Arguably belongs in the answerable slice — flag for
+      review once the refusal boundary is settled.
+
+  # --- Qiwa procedural how-tos ----------------------------------------------
+  - id: GS-R-009
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      في حال انهيت العقد على المادة 75 ايش الخيار المناسب في منصة قوى لانهاء العقد؟
+    refusal_category: qiwa_procedures
+    expected_pointer: "منصة قوى — qiwa.sa"
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-75-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 16 February 2026"
+    notes: >
+      A pure which-button question — no legal content at all. This is the clean
+      Qiwa refusal, and the contrast case for GS-A-013, which only looks like one.
+
+  - id: GS-R-010
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      انا في فترة التجربه ودخلت أنهي العقد من قوي خلال فترة التجربه طبقا للماده 53 من نظام العمل ولكن منصة قوي رفضت تنهي العقد وظهرت لي رساله بإنه لايجوز إختيار هذا السبب الا للوافدين الذين اكملوا سنه السؤال هو لناذا تظهر هذه الرساله رغم انا حاليا في فترة التجربه ويحق لي انهاء العقد طبقا للماده 53
+    refusal_category: qiwa_procedures
+    expected_pointer: "منصة قوى — qiwa.sa"
+    provenance:
+      source: public_forum
+      url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
+      retrieved: 2026-08-19
+      note: "comment dated 6 March 2026"
+    notes: >
+      Contested classification. Qiwa is asserting an expat-mobility rule that the
+      user believes contradicts Article 53 — arguably the same shape as GS-A-013
+      and therefore answerable. Kept as a refusal for now because the blocking
+      rule is an immigration rule, not a labour one. Revisit.
