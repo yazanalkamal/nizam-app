@@ -1,0 +1,22 @@
+[project]
+name = "nizam-app"
+version = "0.1.0"
+description = "Arabic-first RAG + agent system over the Saudi Labor Law"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.9",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

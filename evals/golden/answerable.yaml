@@ -1,0 +1,11 @@
+# Golden set — answerable slice (target: 35)
+#
+# Questions the system SHOULD answer, each labeled with the article(s) that
+# support the answer. Measures retrieval recall@5 and MRR, plus the LLM-judge
+# answer grade. These 35 also serve as the over-refusal denominator: a refusal
+# here is a failure.
+#
+# Format and status lifecycle: see README.md in this directory.
+# Write questions first with status: drafted. Labels come after ingestion.
+
+cases: []

@@ -1,0 +1,18 @@
+# Golden set — refusal slice (target: 20)
+#
+# Questions the system MUST refuse, each with the category it should name and the
+# official source it should redirect to. Measures refusal recall.
+#
+# A refusal is a helpful redirect that names the topic and points somewhere real
+# — never a bare "I can't help with that".
+#
+# Categories to cover: gosi, implementing_regulations, domestic_workers,
+# immigration_iqama, qiwa_procedures, pre_amendment, legal_advice, out_of_corpus.
+#
+# The highest-value case in the whole golden set lives here: an end-of-service
+# question entangled with GOSI. Answering it correctly means refusing one half
+# by name without refusing the other.
+#
+# Format and status lifecycle: see README.md in this directory.
+
+cases: []

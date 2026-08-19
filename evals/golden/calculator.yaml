@@ -1,0 +1,17 @@
+# Golden set — calculator slice (target: 15)
+#
+# End-of-service benefit questions with exact expected numbers. Scored by exact
+# match; no LLM judge is involved in this slice.
+#
+# Must include the adversarial cases, not just the happy path:
+#   - resignation under 2 years of service
+#   - fractional years
+#   - wage changes shortly before termination (out of scope — the system must
+#     say so rather than guessing)
+#
+# Monetary values are QUOTED STRINGS. A bare YAML number parses as a float and
+# will not survive exact-match comparison; the validator rejects floats.
+#
+# Format and status lifecycle: see README.md in this directory.
+
+cases: []
