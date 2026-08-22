@@ -12,9 +12,10 @@
 #
 # WHAT THE FIRST RESEARCH PASS FOUND: of ~40 real questions collected, NOT ONE
 # supplied a wage, a start date, an end date and a termination type together.
-# People write "خدمتي 7 سنوات" and never mention their salary. So every case
-# below is a clarification case, and the `expects: amount` cases still have to be
-# authored by hand with complete inputs.
+# People write "خدمتي 7 سنوات" and never mention their salary. Which is why the
+# `expects: amount` cases further down are SYNTHETIC and say so: no real question
+# carries a wage, both dates and a termination type at once, so the slice that
+# scores arithmetic has to be constructed rather than collected.
 
 cases:
   - id: GS-C-001
@@ -147,3 +148,276 @@ cases:
     notes: >
       User rounds 9y11m to "10 years" themselves in both halves. The system must
       not adopt the user's rounding in either language.
+
+  # --- complete inputs: the exact-match cases ---------------------------------
+  # Authored, not collected. Every one supplies a wage, a start date, an end date
+  # and a termination type, because that is what it takes to demand an exact
+  # figure — and no real question does. The realism lives in the clarification
+  # cases above; the arithmetic lives here.
+  #
+  # These stay `drafted` on purpose. expected_amount is blank because the figure
+  # has to come from Articles 84/85 as they read in the INGESTED text, and nobody
+  # has opened that text yet. Filling these in from memory or from a law-firm blog
+  # is the exact failure D11 exists to prevent. Ingestion turns them into
+  # `labeled`, and only then does exact-match have anything to score.
+  #
+  # Coverage is by termination type and by service-length tier, so a formula that
+  # is right in one branch and wrong in another cannot hide behind an average:
+  #
+  #   employer_termination  over and under five years
+  #   resignation           under two years, the middle tier, and past ten
+  #   contract_expiry       a fixed term running to its end
+  #   article_80            termination for cause
+  #   article_81            worker leaves citing employer breach
+  #
+  # KNOWN GAP: mutual_agreement has no case. It is the one termination type where
+  # the classification, not the arithmetic, does the work — worth a case of its
+  # own once the article cluster has been read.
+
+  - id: GS-C-006
+    slice: calculator
+    language: ar
+    status: drafted
+    topic: eosb
+    expects: amount
+    question: |-
+      راتبي الشهري ١٢٠٠٠ ريال ، باشرت العمل بتاريخ ١ مارس ٢٠١٨ وأنهت الشركة عقدي بتاريخ ٣٠ يونيو ٢٠٢٥ بدون سبب مشروع . كم مكافأة نهاية الخدمة المستحقة لي ؟
+    inputs:
+      monthly_wage: "12000.00"
+      start_date: 2018-03-01
+      end_date: 2025-06-30
+      termination_type: employer_termination
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Synthetic: complete inputs, authored for the exact-match slice."
+    notes: >
+      Service crosses the five-year mark, so it exercises both halves of the split
+      and a partial final year at once. Arabic-Indic digits in the wage and in all
+      three dates — the normalizer runs before parameter extraction, and this is
+      the case that fails loudly if it does not.
+
+  - id: GS-C-007
+    slice: calculator
+    language: en
+    status: drafted
+    topic: eosb
+    expects: amount
+    question: |-
+      My monthly salary is 8,000 SAR. I started on 15 January 2022 and the company terminated my contract on 30 April 2025. How much end of service benefit am I owed?
+    inputs:
+      monthly_wage: "8000.00"
+      start_date: 2022-01-15
+      end_date: 2025-04-30
+      termination_type: employer_termination
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Synthetic: complete inputs, authored for the exact-match slice."
+    notes: >
+      Entirely inside the first tier, so it isolates one branch. Mid-month start
+      against a month-end finish makes the partial year awkward on purpose: any
+      day-counting convention the calculator picks has to be a deliberate decision
+      recorded in code, not an accident of whichever date library is imported.
+
+  - id: GS-C-008
+    slice: calculator
+    language: ar
+    status: drafted
+    topic: eosb
+    expects: amount
+    question: |-
+      راتبي 7000 ريال ، بدأت العمل في 1 يناير 2024 وقدمت استقالتي والتزمت بفترة الإشعار وآخر يوم لي 30 يونيو 2025 . كم أستحق من مكافأة نهاية الخدمة ؟
+    inputs:
+      monthly_wage: "7000.00"
+      start_date: 2024-01-01
+      end_date: 2025-06-30
+      termination_type: resignation
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Synthetic: complete inputs, authored for the exact-match slice."
+    notes: >
+      The sub-two-year resignation the spec names as adversarial, here with a
+      complete parameter set so it produces a number instead of a question. Whether
+      that number is zero is read off the ingested text at labeling time, not
+      assumed here. Deliberately paired in shape with GS-A-005, which asks the same
+      boundary as an entitlement question rather than a calculation.
+
+  - id: GS-C-009
+    slice: calculator
+    language: ar
+    status: drafted
+    topic: eosb
+    expects: amount
+    question: |-
+      أجري الشهري 9500 ريال ، التحقت بالعمل في 1 سبتمبر 2021 واستقلت وانتهت خدمتي في 28 فبراير 2025 . كم تكون مكافأة نهاية الخدمة ؟
+    inputs:
+      monthly_wage: "9500.00"
+      start_date: 2021-09-01
+      end_date: 2025-02-28
+      termination_type: resignation
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Synthetic: complete inputs, authored for the exact-match slice."
+    notes: >
+      Resignation in the middle service tier, where the award is a fraction of the
+      termination figure — two rules composing, which is where a calculator that
+      passes every single-rule test starts failing. End date is the last day of a
+      short month; leap-year handling is a separate concern and stays out of this
+      case on purpose.
+
+  - id: GS-C-010
+    slice: calculator
+    language: en
+    status: drafted
+    topic: eosb
+    expects: amount
+    question: |-
+      I have been with the company since 1 April 2013 and I am resigning with my last working day on 31 May 2025. My monthly salary is 20,000 SAR. What is my end of service award?
+    inputs:
+      monthly_wage: "20000.00"
+      start_date: 2013-04-01
+      end_date: 2025-05-31
+      termination_type: resignation
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Synthetic: complete inputs, authored for the exact-match slice."
+    notes: >
+      Past the ten-year mark, the top resignation tier. Twelve years of service
+      spans three leap years, so it is also the case that catches a duration
+      routine built on a fixed 365-day year.
+
+  - id: GS-C-011
+    slice: calculator
+    language: ar
+    status: drafted
+    topic: eosb
+    expects: amount
+    question: |-
+      عقدي محدد المدة براتب 11000 ريال ، بدايته 1 سبتمبر 2022 وينتهي في 31 أغسطس 2025 ولن يتم تجديده . كم مكافأة نهاية الخدمة ؟
+    inputs:
+      monthly_wage: "11000.00"
+      start_date: 2022-09-01
+      end_date: 2025-08-31
+      termination_type: contract_expiry
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Synthetic: complete inputs, authored for the exact-match slice."
+    notes: >
+      A fixed term running to its natural end, which is neither a resignation nor a
+      termination and must not be silently folded into either. Service lands one
+      day short of three years — close enough to a tier boundary that a rounding
+      shortcut shows up as a wrong number rather than as a near-miss.
+
+  - id: GS-C-012
+    slice: calculator
+    language: en
+    status: drafted
+    topic: eosb
+    expects: amount
+    question: |-
+      My salary is 13,000 SAR a month. I joined on 1 February 2019 and the company dismissed me on 31 March 2025 under Article 80. What end of service benefit do I get?
+    inputs:
+      monthly_wage: "13000.00"
+      start_date: 2019-02-01
+      end_date: 2025-03-31
+      termination_type: article_80
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Synthetic: complete inputs, authored for the exact-match slice."
+    notes: >
+      Dismissal for cause. Six years of service would otherwise produce a
+      substantial figure, so the branch is the whole test: a calculator that
+      ignores termination_type and computes from the dates alone passes every other
+      amount case in this file and fails this one.
+
+  - id: GS-C-013
+    slice: calculator
+    language: ar
+    status: drafted
+    topic: eosb
+    expects: amount
+    question: |-
+      راتبي 10500 ريال ، عملت من 1 نوفمبر 2020 وتركت العمل في 31 يوليو 2025 بموجب المادة 81 لأن صاحب العمل أخل بالتزاماته . كم مكافأة نهاية الخدمة المستحقة ؟
+    inputs:
+      monthly_wage: "10500.00"
+      start_date: 2020-11-01
+      end_date: 2025-07-31
+      termination_type: article_81
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Synthetic: complete inputs, authored for the exact-match slice."
+    notes: >
+      The mirror of GS-C-012 and the reason both are here. The worker leaves of
+      their own motion, which looks like a resignation on the surface, but the
+      legal basis is the employer's breach. If article_81 and resignation produce
+      the same number, the classifier is reading who walked out rather than why.
+
+  # --- out of scope: the calculator must decline ------------------------------
+  # Both cases are `labeled`, not `drafted`. They assert only that the calculator
+  # should decline and say why, which is settled by the Phase 1 spec and needs no
+  # article text — the same reason the refusal slice can be labeled before
+  # ingestion.
+
+  - id: GS-C-014
+    slice: calculator
+    language: ar
+    status: labeled
+    topic: eosb
+    expects: out_of_scope
+    question: |-
+      كان راتبي ٨٠٠٠ ريال وقبل شهرين من نهاية الخدمة ترقيت وصار ١٢٠٠٠ ريال . خدمتي ٦ سنوات وانتهى عقدي . المكافأة تتحسب على أي راتب ، القديم ولا الجديد ؟
+    inputs:
+      monthly_wage: null
+      stated_duration: "٦ سنوات"
+      termination_type: contract_expiry
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Synthetic. The wage-change case the Phase 1 spec names as out of scope."
+    notes: >
+      Named out of scope in the spec, and the input model is why: the calculator
+      takes ONE wage. A service history with a wage change part-way cannot be
+      expressed in it, so the honest response is to say so and point at the
+      official channel — not to quietly pick one of the two numbers. monthly_wage
+      is null here precisely because the question supplies two and the schema has
+      no way to hold that.
+
+  - id: GS-C-015
+    slice: calculator
+    language: en
+    status: labeled
+    topic: eosb
+    expects: out_of_scope
+    question: |-
+      I worked at the company for 3 years, left for 8 months, then was rehired and have now been back for 4 years. Is my end of service calculated on 7 years or only on the last 4?
+    inputs:
+      monthly_wage: null
+      stated_duration: "3 years, an 8 month break, then 4 years"
+      termination_type: null
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Synthetic: broken service history, unrepresentable in the input model."
+    notes: >
+      Broken service. Whether the two spells join is a legal question, and the
+      calculator's inputs are a single start/end pair with nowhere to put the gap —
+      so treating it as continuous is not a rounding error, it is an invented
+      answer. Distinct from a clarification case: no follow-up question would
+      rescue this one, because the missing thing is a rule, not a parameter.
