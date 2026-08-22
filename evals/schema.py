@@ -123,13 +123,19 @@ class MissingParameter(StrEnum):
     TERMINATION_TYPE = "termination_type"
 
 
-def _money(value: object) -> Decimal:
+def _money(value: object) -> Decimal | None:
     """Parse a monetary value, rejecting floats.
+
+    None passes through: the fields this guards are optional, and a case that spells
+    the absence out as `monthly_wage: null` means the same thing as one that omits
+    the key. Rejecting the explicit form would punish the clearer of the two.
 
     YAML turns a bare 31250.50 into a float, and float noise breaks the exact-match
     comparison this slice is scored on. Quoting is enforced here rather than left to
     whoever is editing the file at the time.
     """
+    if value is None:
+        return None
     if isinstance(value, float):
         raise ValueError(
             f"monetary value {value!r} parsed as a float — quote it in YAML "

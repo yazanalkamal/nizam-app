@@ -181,6 +181,20 @@ def test_unquoted_money_in_yaml_is_rejected():
         GoldenFile.model_validate(document)
 
 
+def test_explicit_null_wage_is_accepted():
+    """`monthly_wage: null` must mean the same as omitting the key.
+
+    The float guard runs before pydantic coerces the value, so it also sees an
+    explicit null and has to let it through. A case that spells out an absent wage
+    is clearer than one that leaves the reader to notice a missing line, and the
+    schema should not punish the clearer form.
+    """
+    parsed = GoldenFile.model_validate(
+        {"cases": [_calc_case(inputs={"monthly_wage": None, "termination_type": "resignation"})]}
+    )
+    assert parsed.cases[0].inputs.monthly_wage is None
+
+
 def test_labeled_calculator_case_requires_an_expected_amount():
     with pytest.raises(ValidationError, match="requires expected_amount"):
         GoldenFile.model_validate({"cases": [_calc_case(status="labeled")]})
