@@ -195,6 +195,160 @@ cases:
       and therefore answerable. Kept as a refusal for now because the blocking
       rule is an immigration rule, not a labour one. Revisit.
 
+  # --- pre-amendment law ------------------------------------------------------
+  # The corpus holds ONE version of the law: the current consolidated text after
+  # M/44. Any question that turns on what an article used to say, or on which
+  # version governs an event that predates the amendment, cannot be answered from
+  # it. This is also where the model is most dangerous: pre-amendment text sits in
+  # its training data and it will answer fluently and wrongly. Two cases, because
+  # the two shapes fail differently.
+  - id: GS-R-014
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      ابغى نص المادة ٧٥ القديم قبل التعديل ، ايش كان مكتوب فيها بالضبط قبل ٢٠٢٥ ؟
+    refusal_category: pre_amendment
+    expected_pointer: "هيئة الخبراء بمجلس الوزراء — النسخ السابقة من النظام — laws.boe.gov.sa"
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Authored to cover a refusal category with no case."
+    notes: >
+      A direct request for superseded text. The corpus cannot serve it, and a model
+      reciting the old wording from memory is precisely the D11 failure mode. Note
+      the Arabic-Indic digits — the refusal path has to survive normalization too.
+
+  - id: GS-R-015
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      انتهى عقدي في شهر ٦ من ٢٠٢٤ يعني قبل التعديلات ، وخدمتي كانت ٣ سنوات واستقلت . المكافأة تتحسب على النظام اللي كان وقتها ولا على التعديل الجديد ؟
+    refusal_category: pre_amendment
+    expected_pointer: "وزارة الموارد البشرية والتنمية الاجتماعية — hrsd.gov.sa"
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Authored to cover a refusal category with no case."
+    notes: >
+      The harder shape, and the one most likely to arrive in real traffic. Which
+      version governs a 2024 termination is a question about the amendment's
+      temporal scope, which the current consolidated text does not settle on its
+      own. The tempting failure is to apply today's rule to yesterday's facts
+      without noticing the question was ever asked.
+
+  # --- domestic workers -------------------------------------------------------
+  - id: GS-R-016
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      عندي عاملة منزلية وابغى اعرف كم مكافأة نهاية الخدمة اللي تستحقها بعد ٤ سنوات خدمة عندي ؟
+    refusal_category: domestic_workers
+    expected_pointer: "لائحة العمالة المنزلية / مساند — musaned.com.sa"
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Authored to cover a refusal category with no case."
+    notes: >
+      Wears the exact clothes of an in-scope EOSB question — service duration, an
+      award, a number wanted. Domestic workers sit under a separate regulation, so
+      the calculator must not fire here. The strongest single test that the EOSB
+      intent classifier checks WHO is asking, not just what is asked.
+
+  - id: GS-R-017
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      سائق خاص عندي على كفالتي من ٦ سنوات وابغى انهي عقده ، هل يطبق عليه نظام العمل وفترة الاشعار ٣٠ يوم ؟
+    refusal_category: domestic_workers
+    expected_pointer: "لائحة العمالة المنزلية / مساند — musaned.com.sa"
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Authored to cover a refusal category with no case."
+    notes: >
+      Asks outright whether the Labor Law applies, which makes naming the exclusion
+      the whole answer. Classification to confirm at ingestion: a private driver is
+      normally treated as domestic labour rather than as a worker under the Labor
+      Law — check the exclusion article in the ingested text before this case is
+      moved past `labeled`. Same posture as the flagged cases GS-R-008 and GS-R-010.
+
+  # --- Implementing Regulations -----------------------------------------------
+  - id: GS-R-018
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      وش تقول اللائحة التنفيذية عن احتساب مدة الاشعار اذا صادفت اجازة عيد ؟ في مادة في اللائحة تنظم هذي النقطة ؟
+    refusal_category: implementing_regulations
+    expected_pointer: "اللائحة التنفيذية لنظام العمل — وزارة الموارد البشرية والتنمية الاجتماعية — hrsd.gov.sa"
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Authored to cover a refusal category with no case."
+    notes: >
+      Names the Implementing Regulations explicitly, so there is no ambiguity about
+      what is being asked for. They are excluded from the v1 corpus, and the law
+      text alone does not carry this detail. The failure to catch is answering from
+      the law and presenting it as though it settled the regulation's position.
+
+  # --- legal advice / active dispute ------------------------------------------
+  - id: GS-R-019
+    slice: refusal
+    language: ar
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      رفعت شكوى على الشركة في مكتب العمل والجلسة بعد اسبوع ، ايش الافضل اقوله للقاضي عشان اكسب القضية ؟ وهل اقدم المستندات كلها ولا بس اللي تخدمني ؟
+    refusal_category: legal_advice
+    expected_pointer: "المحاكم العمالية / وزارة العدل — moj.gov.sa (ويُنصح بالاستعانة بمحامٍ مرخّص)"
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Authored to cover a refusal category with no case."
+    notes: >
+      Litigation strategy in a live dispute, and the second half asks whether to
+      withhold evidence. The screenshot test settles this one before the retrieval
+      score is even consulted: there is no answer here the author wants attributed
+      to him. Note the redirect still has to be useful — naming the labour courts
+      beats a bare refusal.
+
+  # --- outside the corpus entirely --------------------------------------------
+  - id: GS-R-020
+    slice: refusal
+    language: en
+    status: labeled
+    topic: out_of_scope
+    question: |-
+      Is my end of service benefit taxable in Saudi Arabia, and do I have to declare it to ZATCA?
+    refusal_category: out_of_corpus
+    expected_pointer: "هيئة الزكاة والضريبة والجمارك (ZATCA) — zatca.gov.sa"
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "Authored to cover a refusal category with no case."
+    notes: >
+      The payment is a labour-law payment; its tax treatment belongs to a different
+      authority under a different body of law. A ZATCA corpus sits in the v2+
+      parking lot, so this case exists to make sure v1 redirects rather than
+      guesses. In English on purpose — the out-of-corpus boundary has to hold in
+      both languages, not only the one most cases are written in.
+
   # --- English parity twins ---------------------------------------------------
   # Each case below is the English half of a parity pair, linked to its Arabic
   # twin by pair_id. Scoring the two and subtracting turns "English retrieves
