@@ -35,6 +35,7 @@ cases:
     language: ar
     status: drafted
     topic: wage_definition
+    pair_id: pair-wage-base-gosi-deduction
     question: |-
       خدمتي 9 سنوات هل استحق مكافءة نهاية الخدمة كاملة علما ان العقد غير محدد المدة وكيف يتم احتساب مكافءة نهاية الخدمة اذا كان الراتب الاجمالي 4200 وبعد خصم التامينات 3930 هل يتم احتساب المكفاءة قبل خصم التامينات او بعد خصم التامينات
     provenance:
@@ -83,6 +84,7 @@ cases:
     language: ar
     status: drafted
     topic: eosb
+    pair_id: pair-sub-two-year-eosb
     question: |-
       خدمتي كانت سنة وستة أشهر، وقد أنهيت عقدي وفق المادة (75) من نظام العمل لأسباب شخصية، مع الالتزام الكامل بفترة الإشعار النظامية. إلا أن الشركة أفادت بعدم استحقاقي لمكافأة نهاية الخدمة بحجة أن مدة خدمتي أقل من سنتين، وذلك استنادًا إلى المادة (85) من نظام العمل هل استحق مكافأة ام لا ؟
     provenance:
@@ -182,6 +184,7 @@ cases:
     language: ar
     status: drafted
     topic: contract_vs_law
+    pair_id: pair-notice-contract-vs-amendment
     question: |-
       عقدي غير محدد المدة و مكتوب في العقد الاشعار شهرين " تم توقيعه قبل التعديل على المادة ٧٥" هل يمشي على ٣٠ يوم كما في التعديل او على مدة الاشعار المذكورة في العقد؟
     provenance:
@@ -284,6 +287,7 @@ cases:
     language: ar
     status: drafted
     topic: probation
+    pair_id: pair-probation-extension-clause
     question: |-
       نص عقد العمل علي فترة تجربة 90 يوم ويوجد نص بالعقد ( فترة التجربة 90 يوم من تاريخ مباشرو اعمل ويحق للشركة تمديدها لفترة مماثلة ) هل يحق للشركة التمديد بعد فترة 90 يوم دون أشعاري طبقا لهذا النص
     provenance:
@@ -366,6 +370,7 @@ cases:
     language: ar
     status: drafted
     topic: annual_leave
+    pair_id: pair-probation-leave-balance
     question: |-
       تم انهاء عقدي خلال فترة التجربة , هل لى الحق فى المطالبة برصيد اجازتي السنوية عن فترة عملي خلال فترة التجربة علما بانها تخطت 140 يوم
     provenance:
@@ -403,3 +408,98 @@ cases:
       url: https://manielaw-sa.com/المادة-53-من-نظام-العمل/
       retrieved: 2026-08-19
       note: "comment dated 4 August 2025"
+
+  # --- English parity twins ---------------------------------------------------
+  # Each case below is the English half of a parity pair, linked to its Arabic
+  # twin by pair_id. Scoring the two and subtracting turns "English retrieves
+  # worse against an Arabic corpus" from a hunch into a number.
+  #
+  # These are translations by the author, not questions found in the wild, so
+  # provenance.source is `author` and the note names the twin. That is the honest
+  # label: the QUESTION is real, the ENGLISH is not.
+  #
+  # Translation policy - content is matched exactly (same facts, same numbers,
+  # same number of separate asks) and register is matched (informal stays
+  # informal, run-on stays run-on). What CANNOT be matched is script-level noise:
+  # Arabic-Indic digits and Arabic misspellings have no English equivalent. So the
+  # English half is slightly cleaner input than the Arabic half by construction,
+  # and part of any measured gap belongs to that, not to the language. Known
+  # confound, recorded here rather than discovered later.
+
+  - id: GS-A-028
+    slice: answerable
+    language: en
+    status: drafted
+    topic: wage_definition
+    pair_id: pair-wage-base-gosi-deduction
+    question: |-
+      I have 9 years of service, am I entitled to the full end of service award? my contract is indefinite. and how is the end of service award calculated if my total salary is 4200 and after the GOSI deduction it is 3930, is the award calculated before the GOSI deduction or after it
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "English twin of GS-A-002."
+    notes: >
+      The over-refusal trap in English. Mentions GOSI but asks what the wage base
+      is, which the Labor Law defines - must be answered. If the refusal
+      classifier fires here but not on the Arabic twin, the gap is in the
+      classifier, not in retrieval.
+
+  - id: GS-A-029
+    slice: answerable
+    language: en
+    status: drafted
+    topic: eosb
+    pair_id: pair-sub-two-year-eosb
+    question: |-
+      My service was 1 year and 6 months, and I ended my contract under Article 75 of the Labor Law for personal reasons, with full compliance with the statutory notice period. However the company stated that I am not entitled to an end of service award on the grounds that my service is less than two years, based on Article 85 of the Labor Law. Am I entitled to an award or not?
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "English twin of GS-A-005."
+    notes: "Sub-two-year service, which the spec names as an adversarial case. Formal register in both halves."
+
+  - id: GS-A-030
+    slice: answerable
+    language: en
+    status: drafted
+    topic: contract_vs_law
+    pair_id: pair-notice-contract-vs-amendment
+    question: |-
+      My contract is indefinite and the notice period written in it is two months ("it was signed before the amendment to Article 75"). Does the 30 days in the amendment apply, or the notice period stated in the contract?
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "English twin of GS-A-012."
+    notes: "Cleanest statement of which-instrument-prevails, and the one that most needs the amended text rather than pre-amendment memory."
+
+  - id: GS-A-031
+    slice: answerable
+    language: en
+    status: drafted
+    topic: probation
+    pair_id: pair-probation-extension-clause
+    question: |-
+      My employment contract states a probation period of 90 days and there is a clause in the contract ( the probation period is 90 days from the date of starting work and the company may extend it for a similar period ). Does the company have the right to extend after the 90 day period without notifying me, under this clause
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "English twin of GS-A-019."
+    notes: "Contract dated after the amendment but drafted from an old template."
+
+  - id: GS-A-032
+    slice: answerable
+    language: en
+    status: drafted
+    topic: annual_leave
+    pair_id: pair-probation-leave-balance
+    question: |-
+      My contract was terminated during the probation period, do I have the right to claim my annual leave balance for the period I worked during probation given that it exceeded 140 days
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "English twin of GS-A-025."

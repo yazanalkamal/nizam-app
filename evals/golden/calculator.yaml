@@ -22,6 +22,7 @@ cases:
     language: ar
     status: drafted
     topic: eosb
+    pair_id: pair-eosb-no-wage-given
     expects: clarification
     question: |-
       تذا كانت خدمتي في الشركة 6 سنوات و 8 اشهر و 20 يوما وتم انهاء عقدي وفقا للمادة 75 من نظام العمل فكم تكون نهاية خدمتي
@@ -66,6 +67,7 @@ cases:
     language: ar
     status: drafted
     topic: eosb
+    pair_id: pair-eosb-user-rounded-service
     expects: clarification
     question: |-
       خدمتي 9 سنوات و11 شهر ، بعد كم يوم النشاط سيغلق ، لكن لم يتم تبليغنا كتابياً بالإنهاء ، هل يحق لي مطالبتهم بمبلغ شهرين الاشعار ومكافئة ال10 سنوات؟! وهل ستكون مستحقاتي على اساس راتب كامل عن كل سنه ؟
@@ -82,3 +84,66 @@ cases:
       User rounds 9y11m to "10 years" themselves. The system must not adopt the
       user's rounding — whether the boundary matters is a legal question, not an
       arithmetic convenience.
+
+  # --- English parity twins ---------------------------------------------------
+  # Each case below is the English half of a parity pair, linked to its Arabic
+  # twin by pair_id. Scoring the two and subtracting turns "English retrieves
+  # worse against an Arabic corpus" from a hunch into a number.
+  #
+  # These are translations by the author, not questions found in the wild, so
+  # provenance.source is `author` and the note names the twin. That is the honest
+  # label: the QUESTION is real, the ENGLISH is not.
+  #
+  # Translation policy - content is matched exactly (same facts, same numbers,
+  # same number of separate asks) and register is matched (informal stays
+  # informal, run-on stays run-on). What CANNOT be matched is script-level noise:
+  # Arabic-Indic digits and Arabic misspellings have no English equivalent. So the
+  # English half is slightly cleaner input than the Arabic half by construction,
+  # and part of any measured gap belongs to that, not to the language. Known
+  # confound, recorded here rather than discovered later.
+
+  - id: GS-C-004
+    slice: calculator
+    language: en
+    status: drafted
+    topic: eosb
+    pair_id: pair-eosb-no-wage-given
+    expects: clarification
+    question: |-
+      If my service at the company is 6 years and 8 months and 20 days and my contract was terminated under Article 75 of the Labor Law then how much is my end of service
+    inputs:
+      stated_duration: "6 years and 8 months and 20 days"
+      termination_type: employer_termination
+    missing_parameters: [monthly_wage]
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "English twin of GS-C-001."
+    notes: >
+      Asks for a figure with no salary anywhere in the question. Parity here is
+      about a behavior, not a number: if the English half invents a wage while the
+      Arabic half asks for one, the clarification policy is language-dependent and
+      that is a bug worth catching before launch.
+
+  - id: GS-C-005
+    slice: calculator
+    language: en
+    status: drafted
+    topic: eosb
+    pair_id: pair-eosb-user-rounded-service
+    expects: clarification
+    question: |-
+      My service is 9 years and 11 months, in a few days the business will close, but we were not notified in writing of the termination, do I have the right to claim from them the two months notice amount and the 10 years award?! and will my dues be on the basis of a full salary for each year?
+    inputs:
+      stated_duration: "9 years and 11 months"
+      termination_type: employer_termination
+    missing_parameters: [monthly_wage]
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "English twin of GS-C-003."
+    notes: >
+      User rounds 9y11m to "10 years" themselves in both halves. The system must
+      not adopt the user's rounding in either language.

@@ -58,6 +58,7 @@ cases:
     language: ar
     status: labeled
     topic: out_of_scope
+    pair_id: pair-saned-eligibility
     question: |-
       هل الماده ٧٥ في العقد الغير محدد المده تأهل للاستفادة من ساند . وشكرا
     refusal_category: gosi
@@ -109,6 +110,7 @@ cases:
     language: ar
     status: labeled
     topic: out_of_scope
+    pair_id: pair-final-exit-visa
     question: |-
       فسخت عقدي خلال فترة تجربه و كفيل رافض يعطيني خروج نهائي اش الحل ؟
     refusal_category: immigration_iqama
@@ -159,6 +161,7 @@ cases:
     language: ar
     status: labeled
     topic: out_of_scope
+    pair_id: pair-qiwa-which-option
     question: |-
       في حال انهيت العقد على المادة 75 ايش الخيار المناسب في منصة قوى لانهاء العقد؟
     refusal_category: qiwa_procedures
@@ -191,3 +194,78 @@ cases:
       user believes contradicts Article 53 — arguably the same shape as GS-A-013
       and therefore answerable. Kept as a refusal for now because the blocking
       rule is an immigration rule, not a labour one. Revisit.
+
+  # --- English parity twins ---------------------------------------------------
+  # Each case below is the English half of a parity pair, linked to its Arabic
+  # twin by pair_id. Scoring the two and subtracting turns "English retrieves
+  # worse against an Arabic corpus" from a hunch into a number.
+  #
+  # These are translations by the author, not questions found in the wild, so
+  # provenance.source is `author` and the note names the twin. That is the honest
+  # label: the QUESTION is real, the ENGLISH is not.
+  #
+  # Translation policy - content is matched exactly (same facts, same numbers,
+  # same number of separate asks) and register is matched (informal stays
+  # informal, run-on stays run-on). What CANNOT be matched is script-level noise:
+  # Arabic-Indic digits and Arabic misspellings have no English equivalent. So the
+  # English half is slightly cleaner input than the Arabic half by construction,
+  # and part of any measured gap belongs to that, not to the language. Known
+  # confound, recorded here rather than discovered later.
+
+  - id: GS-R-011
+    slice: refusal
+    language: en
+    status: labeled
+    topic: out_of_scope
+    pair_id: pair-saned-eligibility
+    question: |-
+      Does Article 75 on an indefinite contract qualify me to benefit from SANED? thanks
+    refusal_category: gosi
+    expected_pointer: "ساند / التأمينات الاجتماعية (GOSI) — gosi.gov.sa"
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "English twin of GS-R-003."
+    notes: >
+      expected_pointer is held identical to the Arabic twin's on purpose. The pair
+      exists to vary ONE thing - the language of the question - so the expected
+      output is kept constant and scoring keys on the destination (gosi.gov.sa),
+      not on the wording. How the refusal text itself mirrors the user's language
+      is an answer-rendering concern, not a golden-set one.
+
+  - id: GS-R-012
+    slice: refusal
+    language: en
+    status: labeled
+    topic: out_of_scope
+    pair_id: pair-final-exit-visa
+    question: |-
+      I terminated my contract during the probation period and my sponsor is refusing to give me a final exit, what is the solution?
+    refusal_category: immigration_iqama
+    expected_pointer: "وزارة الداخلية / أبشر — absher.sa"
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "English twin of GS-R-006."
+
+  - id: GS-R-013
+    slice: refusal
+    language: en
+    status: labeled
+    topic: out_of_scope
+    pair_id: pair-qiwa-which-option
+    question: |-
+      If I ended the contract under Article 75 which is the right option in the Qiwa platform to end the contract?
+    refusal_category: qiwa_procedures
+    expected_pointer: "منصة قوى — qiwa.sa"
+    provenance:
+      source: author
+      url: null
+      retrieved: null
+      note: "English twin of GS-R-009."
+    notes: >
+      A pure which-button question in English. The contrast case for GS-A-013,
+      which mentions Qiwa but is answerable - the distinction has to survive
+      translation or the classifier is keying on the word, not the ask.
