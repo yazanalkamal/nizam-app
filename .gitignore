@@ -6,6 +6,10 @@ CLAUDE.md
 docs-internal/
 .claude/
 
+# Personal learning record — what I practised, for interview prep. Not a project
+# artifact and not anyone else's business.
+SKILLS-LOG.md
+
 # ---- Python ----
 __pycache__/
 *.py[cod]
