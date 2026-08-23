@@ -14,7 +14,7 @@ Ask a labor-law question in Arabic or English. The system answers **only** from 
 
 | | Component | State |
 |---|---|---|
-| 1 | Golden eval set (~80 questions, labeled) | not started |
+| 1 | Golden eval set (~80 questions, labeled) | in progress — 67 cases; refusal, calculator and parity slices at target |
 | 2 | Corpus ingestion + article-level chunking | not started |
 | 3 | Hybrid retrieval (BM25 + dense) | not started |
 | 4 | Cite-or-refuse answer layer | not started |
@@ -23,7 +23,7 @@ Ask a labor-law question in Arabic or English. The system answers **only** from 
 | 7 | Evals in CI | not started |
 | 8 | AWS deploy behind a domain | not started |
 
-Phase 1 ships to a small group of named testers, not the public. Public launch is Phase 2, gated on all eight rows being green.
+Phase 1 ships **publicly**, gated on all eight rows being green. An earlier plan put a 5–10 named-tester round in front of that; it was dropped in favour of launching to real users directly. The trade is deliberate and it is recorded rather than hidden: no private round means no cheap failure-finding before strangers see the first wrong answer, so the confidence gate, the rate limits and the daily cap all become launch-blocking rather than nice-to-have.
 
 ---
 
@@ -78,7 +78,23 @@ flowchart TD
 
 Roughly 245 short articles plus a bounded FAQ set — small enough that I have read the entire corpus. For a legal tool that is a requirement, not a nice-to-have.
 
-**Licensing:** a review of the BOE terms of use, and of how Saudi open-government-data licensing applies to republishing answers grounded in the law text, is **pending**. The finding gets recorded here either way, before anything is served publicly.
+**Licensing.** Reviewed. The finding is more restrictive than the usual "laws aren't copyrighted" shorthand, so it is recorded in full.
+
+The BOE terms of use do not settle it. They restrict what a visitor sends *to* the portal — uploads, spam, malicious files, interception, unreasonable load on the infrastructure — and say nothing about reusing text taken *from* it. There is no copyright clause and no licence grant. One line does bite: the portal is offered for `استخدامك الشخصي`, *your personal use*.
+
+The answer sits in copyright law instead, in two steps.
+
+**Article 4 of نظام حماية حقوق المؤلف** excludes official documents from protection — but conditionally: `مع مراعاة الأحكام الخاصة بتداول هذه الوثائق`, *subject to the provisions governing the circulation of these documents*. The exclusion hands the question on rather than answering it.
+
+**Article 4 of the Implementing Regulation** is where it lands. Authors must observe those circulation provisions `والحصول على الموافقات الرسمية لنشرها أو ترجمتها` — *and obtain the official approvals to publish or translate them* — naming `نصوص الأنظمة`, the texts of laws, explicitly.
+
+So there is no copyright barrier, and a circulation-and-approval requirement in its place. It attaches to two acts this project could perform: reproducing article text, and translating it. Ingesting, chunking and storing the corpus is neither — the requirement bites at output, not at input.
+
+There is no open-data licence to fall back on. The CC-BY licensing that covers `open.data.gov.sa` belongs to the national open data platform; `laws.boe.gov.sa` is not part of it. That silence is consistent: reuse of official texts is governed by the circulation rules, so there was never a portal licence to state.
+
+**Consequence for the design (open, see the decision log).** Answering with article *numbers* plus a link to the official page performs neither named act, while reproducing article text on-page — and translating it into English — performs both. Every Saudi law-firm site explaining these articles today does the former without approval, which is the practical evidence for where the line sits. The choice between the two is not yet made, and the approval question is being pursued in parallel.
+
+*Read from primary text by a non-lawyer. It is an engineering posture, not a legal opinion.*
 
 **Chunking:** one article, one chunk, via a parser written for this document's structure rather than a generic recursive splitter. Legal text has a native unit and citations must resolve to it; character-window chunking would split articles mid-clause and make citation resolution ambiguous. Chunk metadata carries `article_no`, part/chapter title, `amended_by_m44`, `source_url`, and separate retrieval and display text.
 
