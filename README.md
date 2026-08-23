@@ -178,10 +178,19 @@ A privacy notice in Arabic and English is linked from the input box rather than 
 | CI/CD | GitHub Actions → build images → deploy via **AWS SSM** |
 | Secrets | SSM Parameter Store |
 | Monitoring | CloudWatch alarms · structured JSON logs · analytics table in Postgres · minimal admin page |
+| Tracing | OpenTelemetry/OpenInference spans → Postgres · Arize Phoenix run locally |
 
 Bahrain is the closest AWS region; there is no KSA region at time of writing. Deploys go through **SSM, so the instance has no open SSH port** and CI holds no long-lived server credentials.
 
 **Cost governance is a product feature, not an afterthought.** Per-IP-hash token-bucket rate limiting plus a global daily query cap, with a graceful "daily capacity reached" state instead of a failure. The project runs under a hard monthly ceiling, which is what makes an abuse-driven bill an engineering problem worth solving visibly.
+
+**Tracing runs on our own infrastructure, and the UI runs off it.** Spans nest — a query span with retrieval, LLM and tool spans beneath it — carrying prompt version, injected chunk IDs, the raw completion before parsing, token counts, and for tool calls the arguments and the return value or exception. The calculator declining to compute without a wage is a traced event, not something inferred from answer text.
+
+A hosted tracing product was rejected on privacy grounds before features were considered: a prompt contains the user's query and the retrieved article text, so sending it to a third-country vendor would be a *second* cross-border transfer stacked on the Bahrain one. Self-hosted Langfuse was the preferred alternative on features, but its documented minimum is 4 cores and 16 GB against a 2 GB box. So spans are written to the Postgres instance that already exists, shaped to OpenTelemetry/OpenInference conventions, and opened in **Arize Phoenix locally** when something needs investigating. Nothing extra runs in production, and the backend stays swappable.
+
+**Prompts are not retained — they are re-rendered.** Storing prompts would put raw queries in the 90-day store. Instead the trace keeps `prompt_version`, `chunk_ids` and the scrubbed query, which is enough to reconstruct the exact prompt on demand. Reconstruction beats retention: full fidelity while debugging, nothing sensitive at rest. Raw text lives only in the 24–72h quarantine buffer, joined by query ID.
+
+The same span shape holds golden-set runs, so an eval regression in CI is diffable to its cause — a prompt change or a retrieval change — rather than a metric that merely dropped.
 
 ---
 
